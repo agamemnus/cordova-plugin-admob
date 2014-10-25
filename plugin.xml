@@ -18,10 +18,10 @@
  
  <!-- android -->
  <platform name="android">
-  <dependency id="com.google.playservices" version=">=6.1"/>
+  <dependency id="com.google.playservices" />
   <config-file target="res/xml/config.xml" parent="/*">
    <feature name="AdMob">
-    <param name="android-package" value="com.agamemnus.cordova.plugin.AdMob"/>
+    <param name="android-package" value="com.agamemnus.cordova.plugin.AdMob" />
    </feature>
   </config-file>
   <source-file src="src/android/AdMob.java" target-dir="src/com/agamemnus/cordova/plugin" />
