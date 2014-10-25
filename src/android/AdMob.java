@@ -174,7 +174,7 @@ public class AdMob extends CordovaPlugin {
     bannerVisible = false;
     adView.loadAd (buildAdRequest());
     if (autoShowBanner) executeShowAd (true, null);
-    callbackContext.success();
+    callbackContext.success ();
    }
   });
   return null;
@@ -201,10 +201,8 @@ public class AdMob extends CordovaPlugin {
  // Parses the create interstitial view input parameters and runs the create interstitial
  // view action on the UI thread.  If this request is successful, the developer should make the requestAd call to request an ad for the banner.
  //
- // @param inputs The JSONArray representing input parameters.  This function expects the first object in the array to be a JSONObject with the
- //  input parameters.
- // @return A PluginResult representing whether or not the banner was created
- //   successfully.
+ // @param inputs The JSONArray representing input parameters.  This function expects the first object in the array to be a JSONObject with the input parameters.
+ // @return A PluginResult representing whether or not the banner was created successfully.
  private PluginResult executeCreateInterstitialView (JSONObject options, CallbackContext callbackContext) {
   this.setOptions( options );
   autoShowInterstitial = autoShow;
@@ -232,7 +230,7 @@ public class AdMob extends CordovaPlugin {
   }
   Bundle bundle = new Bundle();
   bundle.putInt("cordova", 1);
-  if(adExtras != null) {
+  if (adExtras != null) {
    Iterator<String> it = adExtras.keys();
    while (it.hasNext()) {
     String key = it.next();
@@ -252,9 +250,7 @@ public class AdMob extends CordovaPlugin {
  // Parses the request ad input parameters and runs the request ad action on
  // the UI thread.
  //
- // @param inputs The JSONArray representing input parameters.  This function
- //  expects the first object in the array to be a JSONObject with the
- //  input parameters.
+ // @param inputs The JSONArray representing input parameters.  This function expects the first object in the array to be a JSONObject with the input parameters.
  // @return A PluginResult representing whether or not an ad was requested succcessfully.
  // Listen for onReceiveAd() and onFailedToReceiveAd() callbacks to see if an ad was successfully retrieved.
  private PluginResult executeRequestAd (JSONObject options, CallbackContext callbackContext) {
@@ -283,7 +279,7 @@ public class AdMob extends CordovaPlugin {
   cordova.getActivity().runOnUiThread (new Runnable() {
    @Override public void run() {
     interstitialAd.loadAd (buildAdRequest());
-    delayCallback.success();
+    delayCallback.success ();
    }
   });
   return null;
@@ -308,7 +304,7 @@ public class AdMob extends CordovaPlugin {
      if (adView.getParent() != null) {
       ((ViewGroup)adView.getParent()).removeView(adView);
      }
-     if(bannerOverlap) {
+     if (bannerOverlap) {
       RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(
        RelativeLayout.LayoutParams.MATCH_PARENT,
        RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -341,7 +337,7 @@ public class AdMob extends CordovaPlugin {
   cordova.getActivity().runOnUiThread (new Runnable () {
    @Override public void run() {
    if (interstitialAd.isLoaded()) interstitialAd.show ();
-    if(callbackContext != null) callbackContext.success ();
+    if (callbackContext != null) callbackContext.success ();
    }
   });
   return null;
