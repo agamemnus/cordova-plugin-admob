@@ -159,11 +159,11 @@ public class AdMob extends CordovaPlugin {
   autoShowBanner = autoShow;
   cordova.getActivity().runOnUiThread (new Runnable() {
    @Override public void run () {
+    boolean adViewWasNull = (adView == null);
     if (adView == null) {
      adView = new AdView (cordova.getActivity());
      adView.setAdUnitId (adId);
      adView.setAdSize (adSize);
-     adView.setAdListener (new BannerListener());
     }
     if (adView.getParent() != null) ((ViewGroup)adView.getParent()).removeView(adView);
     if(adViewLayout == null) {
@@ -173,6 +173,7 @@ public class AdMob extends CordovaPlugin {
     }
     bannerVisible = false;
     adView.loadAd (buildAdRequest());
+    if (adViewWasNull) adView.setAdListener (new BannerListener());
     if (autoShowBanner) executeShowAd (true, null);
     callbackContext.success ();
    }
@@ -204,7 +205,7 @@ public class AdMob extends CordovaPlugin {
  // @param inputs The JSONArray representing input parameters.  This function expects the first object in the array to be a JSONObject with the input parameters.
  // @return A PluginResult representing whether or not the banner was created successfully.
  private PluginResult executeCreateInterstitialView (JSONObject options, CallbackContext callbackContext) {
-  this.setOptions( options );
+  this.setOptions (options);
   autoShowInterstitial = autoShow;
   final CallbackContext delayCallback = callbackContext;
   cordova.getActivity().runOnUiThread (new Runnable(){
@@ -212,9 +213,9 @@ public class AdMob extends CordovaPlugin {
    public void run() {
     interstitialAd = new InterstitialAd(cordova.getActivity());
     interstitialAd.setAdUnitId (adId);
-    interstitialAd.setAdListener (new InterstitialListener());
     interstitialAd.loadAd (buildAdRequest());
-    delayCallback.success();
+    interstitialAd.setAdListener (new InterstitialListener());
+    delayCallback.success ();
    }
   });
   return null;
