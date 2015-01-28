@@ -19,7 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -32,6 +31,8 @@ import android.provider.Settings;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import android.util.Log;
 
 public class AdMob extends CordovaPlugin {
  // Common tag used for logging statements.
@@ -166,7 +167,7 @@ public class AdMob extends CordovaPlugin {
      adView.setAdSize (adSize);
     }
     if (adView.getParent() != null) ((ViewGroup)adView.getParent()).removeView(adView);
-    if(adViewLayout == null) {
+    if (adViewLayout == null) {
      adViewLayout = new RelativeLayout (cordova.getActivity());
      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams (RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
      webView.addView (adViewLayout, params);
@@ -185,7 +186,7 @@ public class AdMob extends CordovaPlugin {
   Log.w (LOGTAG, "executeDestroyBannerView");  
   final CallbackContext delayCallback = callbackContext;
    cordova.getActivity().runOnUiThread (new Runnable() {
-   @Override public void run() {
+   @Override public void run () {
     if (adView != null) {
      ViewGroup parentView = (ViewGroup)adView.getParent();
      if (parentView != null) parentView.removeView(adView);
@@ -209,8 +210,7 @@ public class AdMob extends CordovaPlugin {
   autoShowInterstitial = autoShow;
   final CallbackContext delayCallback = callbackContext;
   cordova.getActivity().runOnUiThread (new Runnable(){
-   @Override
-   public void run() {
+   @Override public void run () {
     interstitialAd = new InterstitialAd(cordova.getActivity());
     interstitialAd.setAdUnitId (adId);
     interstitialAd.loadAd (buildAdRequest());
@@ -278,7 +278,7 @@ public class AdMob extends CordovaPlugin {
   }
   final CallbackContext delayCallback = callbackContext;
   cordova.getActivity().runOnUiThread (new Runnable() {
-   @Override public void run() {
+   @Override public void run () {
     interstitialAd.loadAd (buildAdRequest());
     delayCallback.success ();
    }
@@ -299,7 +299,7 @@ public class AdMob extends CordovaPlugin {
   bannerShow = show;
   if (adView == null) return new PluginResult (Status.ERROR, "adView is null: call createBannerView first.");
   cordova.getActivity().runOnUiThread (new Runnable(){
-   @Override public void run() {
+   @Override public void run () {
     if(bannerVisible == bannerShow) { // No change.
     } else if (bannerShow) {
      if (adView.getParent() != null) {
@@ -333,10 +333,10 @@ public class AdMob extends CordovaPlugin {
   return null;
  }
  
- private PluginResult executeShowInterstitialAd(final boolean show, final CallbackContext callbackContext) {
+ private PluginResult executeShowInterstitialAd (final boolean show, final CallbackContext callbackContext) {
   if (interstitialAd == null) return new PluginResult(Status.ERROR, "interstitialAd is null: call createInterstitialView first.");
   cordova.getActivity().runOnUiThread (new Runnable () {
-   @Override public void run() {
+   @Override public void run () {
    if (interstitialAd.isLoaded()) interstitialAd.show ();
     if (callbackContext != null) callbackContext.success ();
    }
@@ -351,27 +351,19 @@ public class AdMob extends CordovaPlugin {
  // document.addEventListener ('onDismissAd'        , function());
  // document.addEventListener ('onLeaveToAd'        , function());
  public class BasicListener extends AdListener {
-  @Override public void onAdFailedToLoad(int errorCode) {
+  @Override public void onAdFailedToLoad (int errorCode) {
    webView.loadUrl (String.format(
-     "javascript:cordova.fireDocumentEvent('onFailedToReceiveAd', { 'error': %d, 'reason':'%s' });",
-     errorCode, getErrorReason(errorCode)));
-  }
-  @Override public void onAdLeftApplication() {
-   webView.loadUrl ("javascript:cordova.fireDocumentEvent('onLeaveToAd');");
+    "javascript:cordova.fireDocumentEvent('onFailedToReceiveAd', { 'error': %d, 'reason':'%s' });",
+    errorCode, getErrorReason(errorCode))
+   );
   }
  }
  
  private class BannerListener extends BasicListener {
-  @Override public void onAdLoaded () {
-   Log.w ("AdMob", "BannerAdLoaded");
-   webView.loadUrl ("javascript:cordova.fireDocumentEvent('onReceiveAd');");
-  }
-  @Override public void onAdOpened () {
-   webView.loadUrl ("javascript:cordova.fireDocumentEvent('onPresentAd');");
-  }
-  @Override public void onAdClosed () {
-   webView.loadUrl ("javascript:cordova.fireDocumentEvent('onDismissAd');");
-  }
+  @Override public void onAdLoaded          () {webView.loadUrl ("javascript:cordova.fireDocumentEvent('onReceiveAd');");}
+  @Override public void onAdOpened          () {webView.loadUrl ("javascript:cordova.fireDocumentEvent('onPresentAd');");}
+  @Override public void onAdClosed          () {webView.loadUrl ("javascript:cordova.fireDocumentEvent('onDismissAd');");}
+  @Override public void onAdLeftApplication () {webView.loadUrl ("javascript:cordova.fireDocumentEvent('onLeaveToAd');");}
  }
  
  private class InterstitialListener extends BasicListener {
@@ -385,6 +377,10 @@ public class AdMob extends CordovaPlugin {
   }
   @Override public void onAdClosed () {
    webView.loadUrl ("javascript:cordova.fireDocumentEvent('onDismissInterstitialAd');");
+   interstitialAd = null;
+  }
+  @Override public void onAdLeftApplication () {
+   webView.loadUrl ("javascript:cordova.fireDocumentEvent('onLeaveToInterstitialAd');");
    interstitialAd = null;
   }
  }
