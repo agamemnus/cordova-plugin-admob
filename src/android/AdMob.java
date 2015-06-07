@@ -62,6 +62,7 @@ public class AdMob extends CordovaPlugin {
  private static final String OPT_AUTO_SHOW     = "autoShow";
  
  // The adView to display to the user.
+ private ViewGroup parentView;
  private AdView adView;
  
  // If the user wants banner view overlap webview, we will need this layout.
