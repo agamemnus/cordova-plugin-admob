@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.os.Bundle;
 
@@ -37,6 +38,8 @@ import android.util.Log;
 public class AdMob extends CordovaPlugin {
  // Common tag used for logging statements.
  private static final String LOGTAG = "AdMob";
+ 
+ private static final boolean CORDOVA_4 = Integer.valueOf(CordovaWebView.CORDOVA_VERSION.split("\\.")[0]) >= 4;
  
  // Cordova Actions.
  private static final String ACTION_SET_OPTIONS              = "setOptions";
@@ -81,7 +84,7 @@ public class AdMob extends CordovaPlugin {
  private boolean bannerVisible        = false;
  private boolean isGpsAvailable       = false;
  private JSONObject adExtras = null;
-
+ 
  @Override public void initialize (CordovaInterface cordova, CordovaWebView webView) {
   super.initialize (cordova, webView);
   isGpsAvailable = (GooglePlayServicesUtil.isGooglePlayServicesAvailable(cordova.getActivity()) == ConnectionResult.SUCCESS);
@@ -168,9 +171,13 @@ public class AdMob extends CordovaPlugin {
     }
     if (adView.getParent() != null) ((ViewGroup)adView.getParent()).removeView(adView);
     if (adViewLayout == null) {
-     adViewLayout = new RelativeLayout (cordova.getActivity());
-     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams (RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-     webView.addView (adViewLayout, params);
+     adViewLayout = new RelativeLayout(cordova.getActivity());
+     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+     if (CORDOVA_4) {
+      ((ViewGroup) webView.getView().getParent()).addView(adViewLayout, params);
+     } else {
+      ((ViewGroup) webView).addView(adViewLayout, params);
+     }
     }
     bannerVisible = false;
     adView.loadAd (buildAdRequest());
@@ -313,13 +320,31 @@ public class AdMob extends CordovaPlugin {
       adViewLayout.addView(adView, params2);
       adViewLayout.bringToFront();
      } else {
-      ViewGroup parentView = (ViewGroup) webView.getParent();
+      if (CORDOVA_4) {
+       ViewGroup wvParentView = (ViewGroup) webView.getView().getParent();
+       
+       if (parentView == null) {
+        parentView = new LinearLayout(webView.getContext());
+       }
+       
+       if (wvParentView != null && wvParentView != parentView) {
+        wvParentView.removeView(webView.getView());
+        ((LinearLayout) parentView).setOrientation(LinearLayout.VERTICAL);
+        parentView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 0.0F));
+        webView.getView().setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0F));
+        parentView.addView(webView.getView());
+        cordova.getActivity().setContentView(parentView);
+       }
+      } else {
+       parentView = (ViewGroup) ((ViewGroup) webView).getParent();
+      }
       if (bannerAtTop) {
        parentView.addView (adView, 0);
       } else {
        parentView.addView (adView);
       }
       parentView.bringToFront ();
+      parentView.requestLayout();
      }
      adView.setVisibility (View.VISIBLE);
      bannerVisible = true;
