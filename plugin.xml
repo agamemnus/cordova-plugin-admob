@@ -18,7 +18,7 @@
  
  <!-- android -->
  <platform name="android">
-  <dependency id="cordova-plugin-googleplayservices" />
+  <dependency id="com.google.playservices" />
   <config-file target="res/xml/config.xml" parent="/*">
    <feature name="AdMob">
     <param name="android-package" value="com.agamemnus.cordova.plugin.AdMob" />
